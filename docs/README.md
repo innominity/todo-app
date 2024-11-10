@@ -136,7 +136,56 @@ npm run serve
 
 ### 3.2 Добавление библиотек и фреймворков (tailwindcss, axios)
 
+Установим пару модулей для упрощения создания приложения
 
+**Axios** - библиотека содержит упрощеннный функционал для отправки запросов
+
+Установим `axios`, для этого откроем терминал в каталоге `frontend` и выполним следующую команду:
+
+```bash
+npm install axios
+```
+
+**Tailwind CSS** - фреймворк с готовыми стилями, установим его выполнив следующие команды
+
+Находясь в каталоге `frontend` в консоли запускаем команду:
+
+```bash
+npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+```
+
+Создадим конф файл 
+```bash
+npx tailwindcss init -p
+```
+
+Находим файл `tailwind.config.js` и меняем его содержимое
+
+```js
+/** @type {import('tailwindcss').Config} */
+export default {
+  purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  content: [],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+После чего добавляем стили `tailwindcss`
+
+Файл `/src/assets/main.css` - если файла нет - то создаем
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+В файле `/src/main.js` в самом верху добавляем импорт
+```
+import './assets/main.css'
+```
 
 ### 3.3 Добавление шаблонов для страниц
 
