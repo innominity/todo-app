@@ -1,0 +1,14 @@
+services:
+  web:
+    build: backend
+    env_file:
+      - .dev.env
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web

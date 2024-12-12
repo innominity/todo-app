@@ -13,5 +13,7 @@ RUN pip install -r requirements.txt
 # Копируем исходники
 COPY . .
 
+EXPOSE 8000
+
 # Запускаем приложение
-CMD ["python", "-m", "manage", "runserver" ]
+CMD ["python", "-m", "manage", "runserver", "0.0.0.0:8000" ]

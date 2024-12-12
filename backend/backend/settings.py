@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+-_hs!)tk3phhmh0gt30nne8vj+)eb$8jwi87wk9pa+2yl@rc_'
+SECRET_KEY = os.environ.get("SECRET_KEY", default='test')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -85,6 +85,18 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+if os.environ.get('POSTGRES_ENGINE', default=''): 
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get('POSTGRES_ENGINE'),   # Используется PostgreSQL
+            'NAME': os.environ.get('POSTGRES_DB'), # Имя базы данных
+            'USER': os.environ.get('POSTGRES_USER'), # Имя пользователя
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'), # Пароль пользователя
+            'HOST': os.environ.get('POSTGRES_HOST'), # Наименование контейнера для базы данных в Docker Compose
+            'PORT': os.environ.get('POSTGRES_PORT'),  # Порт базы данных
+        }
+    }
 
 
 # Password validation
