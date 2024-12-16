@@ -268,18 +268,120 @@ manage.py runserver
 
 Добавим код бэкенда, для этого возьмем исходники из репозитория [github](https://github.com/innominity/todo-app). В репозитории перейдем в каталог `backend`, оттуда скопируем все файлы и директории в каталог нашего приложения `backend`.
 
-## 5 Фронтенд + бэкенд + postgres
+Выполним миграции.
 
+> Что такое миграции [сюда](https://timeweb.cloud/blog/migraciya-bazy-dannyh-kak-sdelat)
 
+В директории `todo/backend` с активированным окружением запускаем команду
+
+```bash
+manage.py migrate
+```
+
+После чего начнется процес миграции, результатом которого станет созданная база данных `db.sqlite3`, которая для django используется по умолчанию (она появится в каталоге).
+В базе данных будут созданы необходимые таблички для приложения, в том числе таблица, где будут хранится наши задания `todo_todotask`.
+
+## 5 Фронтенд + бэкенд - Все, вместе и сразу
 
 ## 6 Создание Docker-образов
 
 ### 6.1 Docker образ для фронтенда
 
+В каталоге `todo-app/frontend` создаем файл `Dockerfile` со следующим содержимым
 
+```
+# Указать базовый образ
+FROM node:20
+
+WORKDIR /app
+
+# Подтянуть зависимости нашего приложения
+COPY ./package.json ./package.json
+COPY ./package-lock.json ./package-lock.json
+
+# Установить библиотеки
+RUN npm install
+
+# Скопировать исходники
+COPY . .
+
+EXPOSE 8080
+
+# Запустить наше приложение
+CMD [ "npm", "run", "serve" ]
+```
 
 ### 6.2 Docker образ для бэкенда
 
+В каталоге `todo-app/backend` создаем файл `Dockerfile` со следующим содержимым
 
+```
+FROM python:3.10.15
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+WORKDIR /home/app
+
+# Копируем файл с зависимостями приложения
+COPY requirements.txt requirements.txt
+# Устанавливаем зависимости
+RUN pip install -r requirements.txt
+
+# Копируем исходники
+COPY . .
+
+EXPOSE 8000
+
+# Запускаем приложение
+CMD ["python", "-m", "manage", "runserver", "0.0.0.0:8000" ]
+```
 
 ## 7 Оркестрация контейнеров с использованием docker compose
+
+Для того чтобы не запускать контейнеры по однму их можно объединить в 1 файл docker-compose.
+
+Создадим в директории `todo-app` файл `docker-compose.dev.yml` со следующим содержимым
+
+```
+services:
+  web:
+    build: backend
+    env_file:
+      - .dev.env
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web
+```
+
+Данный файл будт конфигурацией docker для локальной разработки разработки, в который нужно передать файл окружения `.dev.env`. 
+
+Создадим файл с переменными окружения `.dev.env` и заполним следующими значениями
+
+```
+SECRET_KEY=12321321312
+```
+
+Теперь мы можем запустить сразу 2 контейнера 1 командой (но сначала нужно их сбилдить)
+
+```bash
+docker compose -f docker-compose.dev.yml build
+```
+
+Флагом `-f` мы указываем путь до файла docker-compose
+
+После чего можем запустить
+
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+И проверить результат работы перейдя на [http://localhost:8080](http://localhost:8080)
+
+------------
