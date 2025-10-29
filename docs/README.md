@@ -86,53 +86,65 @@ npm install -g @vue/cli
 В командной строке создаем vue приложение командой
 
 ```bash
-vue create frontend
+vue create vue@latest
 ```
 
-В консоли откроется менеджер создания приложения выберем ручную установку (3 пункт выбираем и жмем `Enter`)
+В консоли откроется менеджер создания приложения (иногда требует установки `create-vue`) последней версии, для этого нужно подтвердить введя `y` и нажав `Enter`
 
-<img src="img/4_vue_create.png">
+Выбираем project name (target directory) `frontend`
 
-На следующей шаге выберем настройки нашего проекта нажимая "ПРОБЕЛ"
+Из всех опций выбираем `Prettier (code formatting)`, далее оставляем все по умолчанию
 
-<img src="img/5_vue_create.png">
+```bash
+◇  Project name (target directory):
+│  frontend
+│
+◇  Select features to include in your project: (↑/↓ to navigate, space to select, a to toggle all, enter to confirm)
+│  Prettier (code formatting)
+│
+◇  Select experimental features to include in your project: (↑/↓ to navigate, space to select, a to toggle all, enter to confirm)
+│  none
+│
+◇  Skip all example code and start with a blank Vue project?
+│  No
 
-После выбора, нажимаем `Enter` - переходим к следующему шагу с выбром версии и выбираем 3 версию
+Scaffolding project in D:\Work\Tests\todo-app\frontend...
+│
+└  Done. Now run:
 
-<img src="img/6_vue_create.png">
+   cd frontend   
+   npm install   
+   npm run format
+   npm run dev   
 
-На следующем шаге выбираем **n**
+| Optional: Initialize Git in your project directory with:
 
-<img src="img/7_vue_create.png">
+   git init && git add -A && git commit -m "initial commit"
+```
 
-Дальше по умолчанию
+Проект создался, теперь предлагают перейти в папку `frontend` и выполнить установку библиотек
 
-<img src="img/8_vue_create.png">
+Выполняем
+```bash
+cd frontend
+npm install
+```
 
-Снова по умолчанию
-
-<img src="img/9_vue_create.png">
-
-<img src="img/10_vue_create.png">
-
-На последнем шаге выбираем **n** - не сохраняем пресет создания проекта
-
-<img src="img/11_vue_create.png">
-
-Нажимаем `Enter` и ждем пока создается проект
+Нажимаем `Enter` и ждем пока идет установка
 
 <img src="img/wait_pablo.jpg">
 
-Когда создание завершится - в папке `todo-app` создаться каталог `frontend` с нашим фронтенж приложением, мы можем его запустить выполнив следующие команды:
+После установки зависимостей в наже приложение `frontend` мы можем его запустить командой
+
+> Важно находится в папке проекта `frontend`
 
 ```bash
-cd frontend
-npm run serve
+npm run dev
 ```
 
-Последней командой мы как раз запускаем наше приложение, которое можно посмотреть перейдя по адресу [http://localhost:8080/](http://localhost:8080/). Должно получится следующее
+Последней командой мы как раз запускаем наше приложение, которое можно посмотреть перейдя по адресу [http://localhost:5173//](http://localhost:5173/). Должно получится следующее
 
-<img src="img/12_vue_create.png">
+<img src="img/vue_empty_run.png">
 
 Если все ок, то можно вернутся в терминал и остановить сервер командой `Ctrl+C`
 
@@ -150,48 +162,53 @@ npm install axios
 
 **Tailwind CSS** - фреймворк с готовыми стилями, установим его выполнив следующие команды
 
+Для установки его проследуем следующим инструкциям со страницы [https://tailwindcss.com/docs/installation/using-vite](https://tailwindcss.com/docs/installation/using-vite)
+
 Находясь в каталоге `frontend` в консоли запускаем команду:
 
 ```bash
-npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+npm install tailwindcss @tailwindcss/vite
 ```
 
-Создадим конф файл 
-```bash
-npx tailwindcss init -p
-```
-
-Находим файл `tailwind.config.js` и меняем его содержимое
+Находим файл `vite.config.js` и меняем его содержимое
 
 ```js
-/** @type {import('tailwindcss').Config} */
-export default {
-  purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  content: [],
-  theme: {
-    extend: {},
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+// добавили
+import tailwindcss from '@tailwindcss/vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    vueDevTools(),
+    // добавили
+    tailwindcss()
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    },
   },
-  plugins: [],
-}
+})
+
 ```
 
 После чего добавляем стили `tailwindcss`
 
 Файл `/src/assets/main.css` - если файла нет - то создаем
 ```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 ```
 
-В файле `/src/main.js` в самом верху добавляем импорт
-```
-import './assets/main.css'
-```
 
 ### 3.3 Добавление шаблонов для страниц
 
-Добавим шаблон нашей страницы, для этого возьмем исходники из репозитория [github](https://github.com/innominity/todo-app). В репозитории перейдем в каталог `frontend`, оттуда скопируем диреторию `src` в каталог нашего приложения `frontend`.
+Добавим шаблон нашей страницы, для этого возьмем исходники из репозитория [github](https://github.com/innominity/todo-app). В репозитории перейдем в каталог `frontend`, оттуда скопируем директорию `src` в каталог нашего приложения `frontend`.
 
 ## 4. Создание бэкенда
 
